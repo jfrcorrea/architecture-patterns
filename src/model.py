@@ -72,6 +72,6 @@ class Batch:
 
 def allocate(line: OrderLine, batches: Iterable[Batch]) -> str:
     """Alocate a line in one of a set of batches"""
-    batch = [b for b in sorted(batches) if b.can_allocate(line)][0]
+    batch = next(b for b in sorted(batches) if b.can_allocate(line))
     batch.allocate(line)
     return batch.reference
