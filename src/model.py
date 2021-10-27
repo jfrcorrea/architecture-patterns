@@ -7,6 +7,13 @@ from datetime import date
 from typing import Iterable, Optional, Set
 
 
+class OutOfStock(Exception):
+    """
+    Exception raised when cannot allocate a line on a batch,
+    because of available quantity is low
+    """
+
+
 @dataclass(frozen=True)
 class OrderLine:
     """"Represents a order line"""
@@ -72,6 +79,9 @@ class Batch:
 
 def allocate(line: OrderLine, batches: Iterable[Batch]) -> str:
     """Alocate a line in one of a set of batches"""
-    batch = next(b for b in sorted(batches) if b.can_allocate(line))
+    try:
+        batch = next(b for b in sorted(batches) if b.can_allocate(line))
+    except StopIteration as err:
+        raise OutOfStock(f"Out of stock for sku {line.sku}") from err
     batch.allocate(line)
     return batch.reference
